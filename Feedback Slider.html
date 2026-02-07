@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Advanced Interactive Feedback Slider</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Poppins,sans-serif;
+}
+
+body{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#0a1a3a,#102a5c);
+}
+
+/* Card */
+.container{
+  width:350px;
+  background:#fff;
+  padding:30px;
+  border-radius:20px;
+  text-align:center;
+  box-shadow:0 25px 50px rgba(0,0,0,0.3);
+  animation:float 4s ease-in-out infinite;
+}
+
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-10px)}
+}
+
+/* Face */
+.face{
+  width:130px;
+  height:130px;
+  border-radius:50%;
+  margin:0 auto 18px;
+  background:linear-gradient(135deg,#fde047,#facc15);
+  position:relative;
+  transition:0.5s ease;
+}
+
+/* Eyes */
+.eye{
+  width:14px;
+  height:14px;
+  background:#000;
+  border-radius:50%;
+  position:absolute;
+  top:40px;
+  transition:0.3s;
+}
+
+.eye.left{ left:38px; }
+.eye.right{ right:38px; }
+
+/* Mouth */
+.mouth{
+  width:52px;
+  height:26px;
+  border-bottom:5px solid #000;
+  border-radius:0 0 50px 50px;
+  position:absolute;
+  bottom:32px;
+  left:50%;
+  transform:translateX(-50%);
+  transition:0.4s ease;
+}
+
+/* Text */
+.question{
+  font-weight:600;
+  margin-bottom:14px;
+}
+
+.reaction{
+  margin-top:12px;
+  font-weight:600;
+  transition:0.3s;
+}
+
+/* Slider */
+input[type="range"]{
+  width:100%;
+  appearance:none;
+  height:6px;
+  border-radius:10px;
+  background:#facc15;
+  outline:none;
+  transition:0.3s;
+}
+
+input[type="range"]::-webkit-slider-thumb{
+  appearance:none;
+  width:20px;
+  height:20px;
+  border-radius:50%;
+  background:currentColor;
+  cursor:pointer;
+}
+
+/* Button */
+button{
+  margin-top:20px;
+  width:100%;
+  padding:12px;
+  background:#000;
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  font-size:15px;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+button:hover{
+  transform:scale(1.05);
+}
+
+/* Success */
+.success{
+  display:none;
+  margin-top:15px;
+  font-weight:600;
+  color:#22c55e;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container" id="card">
+
+  <div class="face" id="face">
+    <div class="eye left" id="eyeL"></div>
+    <div class="eye right" id="eyeR"></div>
+    <div class="mouth" id="mouth"></div>
+  </div>
+
+  <div class="question">How was your experience?</div>
+
+  <input type="range" min="0" max="4" value="2" id="slider">
+
+  <div class="reaction" id="reaction">Okay</div>
+
+  <button id="btn">Send Feedback</button>
+  <div class="success" id="success">Thank You 💙</div>
+
+</div>
+
+<script>
+const slider = document.getElementById("slider");
+const face = document.getElementById("face");
+const mouth = document.getElementById("mouth");
+const reaction = document.getElementById("reaction");
+const eyeL = document.getElementById("eyeL");
+const eyeR = document.getElementById("eyeR");
+const btn = document.getElementById("btn");
+const success = document.getElementById("success");
+const card = document.getElementById("card");
+
+const states = [
+  { text:"Terrible", color:["#ef4444","#dc2626"], mood:"angry" },
+  { text:"Not Good", color:["#f97316","#ea580c"], mood:"flat" },
+  { text:"Okay", color:["#fde047","#facc15"], mood:"smile" },
+  { text:"Good", color:["#22c55e","#16a34a"], mood:"smile" },
+  { text:"Excellent!", color:["#8b5cf6","#6d28d9"], mood:"big" }
+];
+
+slider.addEventListener("input",()=>{
+  const s = states[slider.value];
+
+  face.style.background = `linear-gradient(135deg,${s.color[0]},${s.color[1]})`;
+  slider.style.background = s.color[0];
+  slider.style.color = s.color[1];
+  reaction.textContent = s.text;
+  reaction.style.color = s.color[1];
+
+  /* Mouth */
+  if(s.mood==="angry"){
+    mouth.style.borderRadius="0";
+    mouth.style.transform="translateX(-50%) rotate(180deg)";
+  }
+  else if(s.mood==="flat"){
+    mouth.style.borderRadius="0";
+    mouth.style.transform="translateX(-50%)";
+  }
+  else if(s.mood==="smile"){
+    mouth.style.borderRadius="0 0 50px 50px";
+    mouth.style.transform="translateX(-50%)";
+  }
+  else{
+    mouth.style.width="65px";
+    mouth.style.borderBottom="6px solid #000";
+    mouth.style.transform="translateX(-50%)";
+  }
+
+  /* Eyes follow */
+  const offset = (slider.value-2)*3;
+  eyeL.style.transform = `translateX(${offset}px)`;
+  eyeR.style.transform = `translateX(${offset}px)`;
+});
+
+/* Submit Animation */
+btn.onclick=()=>{
+  card.style.transform="scale(0.95)";
+  success.style.display="block";
+  setTimeout(()=>card.style.transform="scale(1)",300);
+};
+</script>
+
+</body>
+</html>
